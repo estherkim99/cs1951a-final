@@ -5,6 +5,7 @@ import sqlite3
 # READING IN DATA FROM CSV FILES
 def read_data(path):
 	with open(path) as f:
+
 		df = pd.read_csv(f)
 	return df
 
@@ -22,6 +23,9 @@ def process_zillow_data(df, cols_to_drop, locations):
 	# print(df.columns)
 	# print(df.describe())
 	# print(df.dtypes)
+	# fixing column names to match the airbnb data
+	df.columns = map(str.lower, df.columns)
+	df = df.rename(columns={'regionname':'zipcode'})
 	return df
 
 
