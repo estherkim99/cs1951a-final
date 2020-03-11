@@ -2,6 +2,8 @@ import numpy as np
 import pandas as pd
 import sqlite3
 import re
+import requests
+from io import StringIO
 from os import listdir
 from preprocess_zillow import add_to_db, read_data
 
@@ -13,7 +15,7 @@ def process_airbnb_data(df, cols_to_keep, money_cols):
     # Remove rows with no zipcodes
     df = df.dropna(subset = ['zipcode'])
     # Extracts zip codes using a regex
-    df['zipcode'] = df['zipcode'].map(lambda x: re.findall('\\d{5}|$', x)[0])
+    df['zipcode'] = df['zipcode'].map(lambda x: re.findall('\\d{5}|$', x)[0] if isinstance(x, str) else x)
     df = df[df['zipcode'] != '']
     # Finally changes the type now that we've removed zip codes that can't be parsed into integers, like 12345-6789
     df['zipcode'] = df['zipcode'].astype(int, copy=False)
@@ -26,13 +28,13 @@ def process_airbnb_data(df, cols_to_keep, money_cols):
     return df
     
 def main():
-    all_csv_files = ['./data/airbnb/' + file_name for file_name in listdir('./data/airbnb/')]
+    local_csv_files = ['./data/airbnb/' + file_name for file_name in listdir('./data/airbnb/')]
     path_to_db = './data/housing.db'
     cols_to_keep = ['id', 'last_scraped', 'street', 'neighbourhood_cleansed', 'city', 'state', 'zipcode', 'latitude', 'longitude', 'accommodates', 'bathrooms', 'bedrooms', 'beds', 'price', 'weekly_price', 'monthly_price', 'security_deposit', 'cleaning_fee', 'minimum_nights', 'maximum_nights', 'calendar_updated', 'availability_30', 'availability_60', 'availability_90']
     money_cols = ['price', 'weekly_price', 'monthly_price', 'security_deposit', 'cleaning_fee']
 
     all_cities_df = pd.DataFrame()
-    for path in all_csv_files:
+    for path in local_csv_files:
         df = read_data(path)
         print("Finished reading data from {}".format(path))
 
