@@ -8,7 +8,7 @@ from os import listdir
 from preprocess_zillow import add_to_db, read_data
 
 # DATA PROCESSING
-def process_airbnb_data(df, cols_to_keep, money_cols):
+def process_airbnb_data(df, cols_to_keep, money_cols, city):
     # Select certain columns from the downloaded CSV
     df = df[cols_to_keep]
 
@@ -20,13 +20,15 @@ def process_airbnb_data(df, cols_to_keep, money_cols):
     # Finally changes the type now that we've removed zip codes that can't be parsed into integers, like 12345-6789
     df['zipcode'] = df['zipcode'].astype(int, copy=False)
 
+    df.insert(1, 'cityname', city)
+
     # Now we convert any column in money_cols to FLOAT
     for col in money_cols:
         df[col] = df[col].str.replace('$', '').str.replace(',', '')
         df[col] = df[col].astype(float, copy=False)
 
     return df
-    
+
 def main():
     local_csv_files = ['./data/airbnb/' + file_name for file_name in listdir('./data/airbnb/')]
     path_to_db = './data/housing.db'
@@ -35,10 +37,13 @@ def main():
 
     all_cities_df = pd.DataFrame()
     for path in local_csv_files:
-        df = read_data(path)
+        path_split = path.split('/')
+        fname = path_split[3]
+        city_split = fname.split(' ')
+        city = city_split[0]
         print("Finished reading data from {}".format(path))
 
-        df = process_airbnb_data(df, cols_to_keep, money_cols)
+        df = process_airbnb_data(df, cols_to_keep, money_cols, city)
         print("Finished processing data from {}".format(path))
 
         all_cities_df = all_cities_df.append(df)
