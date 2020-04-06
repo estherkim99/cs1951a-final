@@ -41,7 +41,7 @@ def main():
 	path_hv = "./data/zillow/Zip_Zhvi_AllHomes.csv"
 	path_r = "./data/zillow/Zip_Zri_AllHomesPlusMultifamily.csv"
 	path_to_db = './data/housing.db'
-	locations = ["BostonMA", "ChicagoIL", "San FranciscoCA", "New YorkNY", "NashvilleTN", "Los AngelesCA", "AustinTX", "SeattleWA", "DenverCO", "AshvilleNC"]
+	locations = ["BostonMA", "ChicagoIL", "San FranciscoCA", "New YorkNY", "NashvilleTN", "Los AngelesCA", "AustinTX", "SeattleWA", "DenverCO", "AshevilleNC"]
 
 	df_hv = read_data(path_hv)
 	print("Finished reading data from {}".format(path_hv))
