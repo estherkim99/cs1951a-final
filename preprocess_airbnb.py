@@ -8,7 +8,7 @@ from os import listdir
 from preprocess_zillow import add_to_db, read_data
 
 # DATA PROCESSING
-def process_airbnb_data(df, cols_to_keep, money_cols, city):
+def process_airbnb_data(df, cols_to_keep, money_cols, filename):
     # Select certain columns from the downloaded CSV
     df = df[cols_to_keep]
 
@@ -20,6 +20,8 @@ def process_airbnb_data(df, cols_to_keep, money_cols, city):
     # Finally changes the type now that we've removed zip codes that can't be parsed into integers, like 12345-6789
     df['zipcode'] = df['zipcode'].astype(int, copy=False)
 
+    # Create a column of consistent city names, drawn from the file names rather than the data itslef
+    city = re.split('\\d|-', filename)[0]
     df.insert(1, 'cityname', city)
 
     # Now we convert any column in money_cols to FLOAT
@@ -27,23 +29,42 @@ def process_airbnb_data(df, cols_to_keep, money_cols, city):
         df[col] = df[col].str.replace('$', '').str.replace(',', '')
         df[col] = df[col].astype(float, copy=False)
 
+    # We uppercase the state column to make it consistent
+    df['state'] = df['state'].str.upper()
+
     return df
 
 def main():
-    local_csv_files = ['./data/airbnb/' + file_name for file_name in listdir('./data/airbnb/')]
+    local_csv_dir = './data/airbnb/'
+    dropbox_link_file = './data/dropbox_links.txt'
     path_to_db = './data/housing.db'
     cols_to_keep = ['id', 'last_scraped', 'street', 'neighbourhood_cleansed', 'city', 'state', 'zipcode', 'latitude', 'longitude', 'accommodates', 'bathrooms', 'bedrooms', 'beds', 'price', 'weekly_price', 'monthly_price', 'security_deposit', 'cleaning_fee', 'minimum_nights', 'maximum_nights', 'calendar_updated', 'availability_30', 'availability_60', 'availability_90']
     money_cols = ['price', 'weekly_price', 'monthly_price', 'security_deposit', 'cleaning_fee']
 
     all_cities_df = pd.DataFrame()
-    for path in local_csv_files:
-        path_split = path.split('/')
-        fname = path_split[3]
-        city_split = fname.split(' ')
-        city = city_split[0]
+
+    with open(dropbox_link_file) as f:
+        dropbox_csv_links = f.read().splitlines()
+        print(dropbox_csv_links)
+
+    for url in dropbox_csv_links:
+        filename = url.split('/')[-1].split('?')[0]
+
+        df = pd.read_csv(url)
+        print("Finished reading data from {}".format(filename))
+
+        df = process_airbnb_data(df, cols_to_keep, money_cols, filename)
+        print("Finished processing data from {}".format(filename))
+
+        all_cities_df = all_cities_df.append(df)
+
+
+    for filename in listdir(local_csv_dir):
+        path = local_csv_dir + filename
+        df = read_data(path)
         print("Finished reading data from {}".format(path))
 
-        df = process_airbnb_data(df, cols_to_keep, money_cols, city)
+        df = process_airbnb_data(df, cols_to_keep, money_cols, filename)
         print("Finished processing data from {}".format(path))
 
         all_cities_df = all_cities_df.append(df)
