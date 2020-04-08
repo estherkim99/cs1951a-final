@@ -10,7 +10,7 @@ from preprocess_zillow import add_to_db, read_data
 # DATA PROCESSING
 def process_airbnb_data(df, cols_to_keep, money_cols, filename):
     # Select certain columns from the downloaded CSV
-    df = df[cols_to_keep]
+    df = df.reindex(columns=cols_to_keep)
 
     # Remove rows with no zipcodes
     df = df.dropna(subset = ['zipcode'])
@@ -26,8 +26,9 @@ def process_airbnb_data(df, cols_to_keep, money_cols, filename):
 
     # Now we convert any column in money_cols to FLOAT
     for col in money_cols:
-        df[col] = df[col].str.replace('$', '').str.replace(',', '')
-        df[col] = df[col].astype(float, copy=False)
+        if df[col].dtypes == "str":
+            df[col] = df[col].str.replace('$', '').str.replace(',', '')
+            df[col] = df[col].astype(float, copy=False)
 
     # We uppercase the state column to make it consistent
     df['state'] = df['state'].str.upper()
@@ -45,7 +46,7 @@ def main():
 
     with open(dropbox_link_file) as f:
         dropbox_csv_links = f.read().splitlines()
-        print(dropbox_csv_links)
+        # print(dropbox_csv_links)
 
     for url in dropbox_csv_links:
         filename = url.split('/')[-1].split('?')[0]
