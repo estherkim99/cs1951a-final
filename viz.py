@@ -149,18 +149,19 @@ def zipcode_scatterplots():
 	# Df5.plot.scatter(x='Number of Airbnbs', y='Avg Home Price', title= "2015");
 
 	# Plots the scatterplots on one page
-	fig, axes = plt.subplots(nrows=2, ncols=3, constrained_layout=True)
+	fig, axes = plt.subplots(nrows=2, ncols=3, constrained_layout=True, sharex=True, sharey=True)
+	fig.suptitle('Average Home Price vs Number of Airbnb per Zipcode by Year');
 
-	Df0.plot.scatter(x='Number of Airbnbs', y='Avg Home Price', title= "2020", ax=axes[0,0]);
-	Df1.plot.scatter(x='Number of Airbnbs', y='Avg Home Price', title= "2019", ax=axes[0,1]);
-	Df2.plot.scatter(x='Number of Airbnbs', y='Avg Home Price', title= "2018", ax=axes[0,2]);
-	Df3.plot.scatter(x='Number of Airbnbs', y='Avg Home Price', title= "2017", ax=axes[1,0]);
-	Df4.plot.scatter(x='Number of Airbnbs', y='Avg Home Price', title= "2016", ax=axes[1,1]);
-	Df5.plot.scatter(x='Number of Airbnbs', y='Avg Home Price', title= "2015", ax=axes[1,2]);
+	Df0.plot.scatter(x='Number of Airbnbs', y='Avg Home Price', title= "2020", ax=axes[0,0], color="#B61A53");
+	Df1.plot.scatter(x='Number of Airbnbs', y='Avg Home Price', title= "2019", ax=axes[0,1], color="#B61A53");
+	Df2.plot.scatter(x='Number of Airbnbs', y='Avg Home Price', title= "2018", ax=axes[0,2], color="#B61A53");
+	Df3.plot.scatter(x='Number of Airbnbs', y='Avg Home Price', title= "2017", ax=axes[1,0], color="#B61A53");
+	Df4.plot.scatter(x='Number of Airbnbs', y='Avg Home Price', title= "2016", ax=axes[1,1], color="#B61A53");
+	Df5.plot.scatter(x='Number of Airbnbs', y='Avg Home Price', title= "2015", ax=axes[1,2], color="#B61A53");
 
 	plt.show(block=True);
 
-# zipcode_scatterplots()
+zipcode_scatterplots()
 
 
 def city_scatterplots():
@@ -361,4 +362,4 @@ def zipcode_bypricerange_scatterplots():
 
 	plt.show(block=True);
 
-zipcode_bypricerange_scatterplots()
+# zipcode_bypricerange_scatterplots()
